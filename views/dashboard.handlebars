@@ -1,0 +1,132 @@
+<section class="grid grid-cols-1 justify-items-center gap-2 p-4">
+	<h2 class="text-xl">Dashboard</h2>
+	{{#each posts as |post|}}
+		<article class="post w-full border rounded-lg p-4 grid grid-cols-2 text-sm sm:text-base" data-post-id="{{post.postId}}" data-post-title="{{post.postTitle}}" data-post="{{post.post}}">
+			<section class="font-medium">{{post.postTitle}}</section>
+			<section class="justify-self-end font-thin">Published {{formatDate post.postDate}}</section>
+		</article>
+	{{/each}}
+</section>
+
+<section id="publish-form" class="grid grid-cols-1 justify-items-center gap-2 p-4" data-user-id="{{userId}}">
+	<button id="add-button" class="border rounded-lg p-4 font-light">Add a Post</button>
+</section>
+
+<!-- script! -->
+
+<script>
+	function displayPublishPostForm(addOrEdit) {
+		document.getElementById("add-button").hidden = true
+		document.getElementById("publish-form").innerHTML = ""
+		const postHeader = document.createElement("h3")
+		postHeader.className = ""
+		if (addOrEdit === "add") {
+			postHeader.innerHTML = "Publish Post"
+		} else if (addOrEdit === "edit") {
+			postHeader.innerHTML = "Edit Post"
+		}
+		const postTitleInput = document.createElement("input")
+		postTitleInput.id = "post-title"
+		postTitleInput.className = "w-full border rounded-lg p-4 border-gray-300 text-black font-light"
+		postTitleInput.type = "text"
+		postTitleInput.placeholder = "Enter a title"
+		const postTextarea = document.createElement("textarea")
+		postTextarea.id = "post"
+		postTextarea.className = "w-full border rounded-lg p-4 border-gray-300 text-black font-light"
+		postTextarea.placeholder = "Say more..."
+		const publishButton = document.createElement("button")
+		publishButton.innerHTML = "Publish"
+		publishButton.id = "publish"
+		publishButton.className = "w-full border rounded-lg p-4 bg-green-400 font-light"
+		const cancelButton = document.createElement("button")
+		cancelButton.innerHTML = "Cancel"
+		cancelButton.id = "cancel"
+		cancelButton.className = "w-full border rounded-lg p-4 bg-yellow-400 font-light"
+		const deleteButton = document.createElement("button")
+		deleteButton.innerHTML = "Delete"
+		deleteButton.id = "delete"
+		deleteButton.className = "w-full border rounded-lg p-4 bg-red-400 font-light"
+		const postForm = document.getElementById("publish-form")
+		postForm.appendChild(postHeader)
+		postForm.appendChild(postTitleInput)
+		postForm.appendChild(postTextarea)
+		postForm.appendChild(publishButton)
+		postForm.appendChild(cancelButton)
+		if (addOrEdit === "edit") {
+			postForm.appendChild(deleteButton)
+		}
+	}
+	document.getElementById("add-button").addEventListener("click", () => {
+		displayPublishPostForm("add")
+		document.getElementById("publish").addEventListener("click", async () => {
+			const postTitle = document.getElementById("post-title").value.trim()
+			const post = document.getElementById("post").value.trim()
+			const postDate = new Date()
+			const userId = document.getElementById("publish-form").getAttribute("data-user-id")
+			if (postTitle && post && postDate && userId) {
+				const response = await fetch(`api/post`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						postTitle,
+						post,
+						postDate,
+						userId,
+					}),
+				})
+				if (response.ok) {
+					location.reload()
+				} else {
+					alert(response.statusText)
+				}
+			}
+		})
+		document.getElementById("cancel").addEventListener("click", () => {
+			location.reload()
+		})
+	})
+	document.querySelectorAll(".post").forEach((post) => {
+		post.addEventListener("click", async (e) => {
+			const postId = e.target.closest(".post").getAttribute("data-post-id")
+			const postTitle = e.target.closest(".post").getAttribute("data-post-title")
+			const post = e.target.closest(".post").getAttribute("data-post")
+			displayPublishPostForm("edit")
+			document.getElementById("post-title").value = postTitle
+			document.getElementById("post").value = post
+			document.getElementById("publish").addEventListener("click", async () => {
+				const postTitle = document.getElementById("post-title").value.trim()
+				const post = document.getElementById("post").value.trim()
+				if (postId && postTitle && post) {
+					const response = await fetch(`api/post/${postId}`, {
+						method: "PATCH",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							postTitle,
+							post,
+						}),				
+					})
+					if (response.ok) {
+						location.reload()
+					} else {
+						alert(response.statusText)
+					}
+				}
+			})
+			document.getElementById("cancel").addEventListener("click", () => {
+				location.reload()
+			})			
+			document.getElementById("delete").addEventListener("click", async () => {
+				if (postId) {
+					const response = await fetch(`api/post/${postId}`, {
+						method: "DELETE",
+						headers: { "Content-Type": "application/json" },
+					})
+					if (response.ok) {
+						location.reload()
+					} else {
+						alert(response.statusText)
+					}
+				}
+			})
+		})
+	})

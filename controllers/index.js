@@ -1,10 +1,10 @@
 const mainRouter = require("express").Router()
 
 
-const apiRoutes = require("./api")
-const htmlRoutes = require("./html")
+const apiRouter = require("./api")
+const htmlRouter = require("./html")
 
-mainRouter.use("/", htmlRoutes)
-mainRouter.use("/api", apiRoutes)
+mainRouter.use("/", htmlRouter)
+mainRouter.use("/api", apiRouter)
 
 module.exports = mainRouter

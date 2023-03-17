@@ -1,0 +1,77 @@
+<article id="post" class="border-b p-4" data-post-id="{{post.postId}}">
+	<h2 class="text-lg sm:text-xl font-medium">{{post.postTitle}}</h2>
+	<section class="text-sm sm:text-base font-thin">
+		Published {{formatDate post.postDate}} by {{post.user.displayName}}
+	</section>
+	<section class="py-2 text-base sm:text-xl font-extralight">
+		{{post.post}}
+	</section>
+	<section class="border rounded-lg my-2 p-2">
+		<h3>Comments</h3>
+		{{#each post.comment}}
+			<article class="py-2">
+				<section class="text-xs sm:text-sm font-thin">Published {{formatDate commentDate}} by {{user.displayName}}</section>
+				<section class="text-sm sm:text-md font-extralight">{{comment}}</section>
+			</article>
+		{{/each}}
+			{{#if userId}}
+				<button id="add-button" class="border-b text-sm sm:text-md font-extralight mb-2">Add a Comment</button>
+			{{else}}
+				<p class="text-sm sm:text-md font-extralight">To add a comment, <a class="underline" href="../sign-up">sign up</a> or <a class="underline" href="../sign-in">sign in</a>.</p>
+			{{/if}}
+		</section>
+		<section id="publish-form" class="grid grid-cols-2 gap-2" data-user-id="{{userId}}">
+		</section>
+</article>
+
+<!--post script! -->
+
+<script>
+	function publishAPostOrComment(addOrEdit, postOrComment) {
+		document.getElementById("add-button").addEventListener("click", (e) => {
+			e.target.hidden = true
+			// Create the elements.
+			const commentTextarea = document.createElement("textarea")
+			commentTextarea.className = "comment-textarea col-span-2 w-full border rounded-lg p-4 border-gray-300 text-black text-sm sm:text-md font-extralight"
+			commentTextarea.placeholder = "Say something..."
+			const publishButton = document.createElement("button")
+			publishButton.innerHTML = "Publish"
+			publishButton.className = "publish-button w-full border rounded-lg p-4 bg-green-400 font-light"
+			const cancelButton = document.createElement("button")
+			cancelButton.innerHTML = "Cancel"
+			cancelButton.className = "cancel-button w-full border rounded-lg p-4 bg-yellow-400 font-light"
+			const publishForm = document.getElementById("publish-form")
+			publishForm.appendChild(commentTextarea)
+			publishForm.appendChild(publishButton)
+			publishForm.appendChild(cancelButton)
+			publishButton.addEventListener("click", async () => {
+				const postId = document.getElementById("post").getAttribute("data-post-id")
+				const comment = commentTextarea.value.trim()
+				const commentDate = new Date()
+				const userId = document.getElementById("publish-form").getAttribute("data-user-id")
+				if (postId && comment && commentDate && userId) {
+					const response = await fetch(`../api/post/${postId}/comment`, {
+						method: "POST",
+						headers: { "Content-Type": "application/json", },
+						body: JSON.stringify({
+							comment,
+							commentDate,
+							userId,
+						}),
+					})
+					if (response.ok) {
+						location.reload()
+					} else {
+						alert("Sorry, something went wrong.")
+					}
+				}
+			})
+			cancelButton.addEventListener("click", () => {
+				location.reload()
+			})
+		})
+	}
+	if (document.getElementById("add-button")) {
+		publishAPostOrComment("add", "comment")
+	}
+</script>

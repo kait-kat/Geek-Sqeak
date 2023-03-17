@@ -1,0 +1,13 @@
+{{#each posts as |post|}}
+	<a href="/post/{{post.postId}}">
+		<article class="border-b p-4">
+			<h2 class="text-lg sm:text-xl font-medium">{{post.postTitle}}</h2>
+			<section class="text-sm sm:text-base font-thin">
+				Published {{formatDate post.postDate}} by {{post.user.displayName}}
+			</section>
+			<section class="py-2 text-base sm:text-xl font-extralight">
+				{{post.post}}
+			</section>
+		</article>
+	</a>
+{{/each}}

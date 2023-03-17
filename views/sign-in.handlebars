@@ -1,0 +1,31 @@
+<section class="grid grid-cols-1 justify-items-center gap-2 p-4">
+	<h2 class="text-xl">Sign In</h2>
+	<input class="w-full sm:w-3/4 border rounded-lg p-4 border-gray-300 text-black" type="text" placeholder="Email" id="email">
+	<input class="w-full sm:w-3/4 border rounded-lg p-4 border-gray-300 text-black" type="password" placeholder="Password" id="password">
+	<button id="sign-in" class="w-full sm:w-3/4 border rounded-lg p-4" type="submit">Sign In</button>
+	<p>Don’t have an account? <a class="underline" href="/sign-up">Sign Up</a></p>
+</section>
+
+<!--sign-in script! -->
+
+<script>
+	document.getElementById("sign-in").addEventListener("click", async () => {
+		const email = document.getElementById("email").value.trim()
+		const password = document.getElementById("password").value.trim()
+		if (email && password) {
+			const response = await fetch("/api/user/sign-in", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email,
+					password,
+				}),
+			})
+			if (response.ok) {
+				document.location.replace("/dashboard")
+			} else {
+				alert(response.statusText)
+			}
+		}
+	})
+</script>
