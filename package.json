@@ -2,7 +2,7 @@
   "name": "geek-squeak",
   "version": "1.0.0",
   "description": "a cms style tech blog",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
@@ -21,6 +21,7 @@
     "luxon": "^3.3.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.2.0",
+    "path": "^0.12.7",
     "sequelize": "^6.29.3"
   }
 }
