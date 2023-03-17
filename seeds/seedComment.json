@@ -1,0 +1,9 @@
+[
+	{
+		"postId": 1,
+		"commentId": 1,
+		"comment": "The 1 comment.",
+		"commentDate": "1337-03-22 12:00:00",
+		"userId": "1"
+	}
+]
